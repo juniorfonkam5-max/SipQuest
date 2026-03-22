@@ -18,24 +18,22 @@ const VoiceEngine = {
         const voices = this.synth.getVoices();
         if (voices.length === 0) return;
         
-        // Prioritize Microsoft "Natural" voices for higher quality and less robotic tones
+        // Strictly prioritize Australian Female "Natural" voices for high quality and sultry tones
         let targetVoice = voices.find(v => 
-            v.name.toLowerCase().includes('natural') && (v.lang.toLowerCase().includes('en-au') || v.lang.toLowerCase().includes('en-gb')) && v.name.toLowerCase().includes('female')
+            v.name.toLowerCase().includes('natural') && (v.lang.toLowerCase().includes('en-au') || v.lang.toLowerCase().includes('en_au')) && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('natasha') || v.name.toLowerCase().includes('annette'))
         ) ||
-        voices.find(v => v.name.toLowerCase().includes('natural') && v.lang.toLowerCase().includes('en-au')) ||
         voices.find(v => 
             (v.lang.toLowerCase().includes('en-au') || v.lang.toLowerCase().includes('en_au')) && 
             (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('natasha') || v.name.toLowerCase().includes('annette'))
         ) || 
-        voices.find(v => v.lang.toLowerCase().includes('en-au') || v.lang.toLowerCase().includes('en_au')) ||
-        voices.find(v => v.name.toLowerCase().includes('australia')) ||
-        voices.find(v => v.name.toLowerCase().includes('natasha'));
-        
-        // Final fallback: Any natural US voice, then standard female
-        if (!targetVoice) {
-            targetVoice = voices.find(v => v.name.toLowerCase().includes('natural') && v.lang.toLowerCase().includes('en-us') && v.name.toLowerCase().includes('female')) ||
-                          voices.find(v => v.lang.toLowerCase().includes('en-') && v.name.toLowerCase().includes('female'));
-        }
+        // Fallback to UK Natural Female if AU female is entirely missing
+        voices.find(v => 
+            v.name.toLowerCase().includes('natural') && v.lang.toLowerCase().includes('en-gb') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('sonia') || v.name.toLowerCase().includes('libby'))
+        ) ||
+        // Final fallback: US Natural Female
+        voices.find(v => v.name.toLowerCase().includes('natural') && v.lang.toLowerCase().includes('en-us') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('aria') || v.name.toLowerCase().includes('jenny'))) ||
+        // If absolutely no Natural voices, any English female
+        voices.find(v => v.lang.toLowerCase().includes('en-') && v.name.toLowerCase().includes('female'));
                         
         this.voice = targetVoice || voices[0];
         console.log("SipQuest TTS Bound:", this.voice ? this.voice.name : "System Default");
@@ -53,7 +51,7 @@ const VoiceEngine = {
                 utterThis.voice = this.voice;
             }
             // Nova's delivery (Sultry, relaxed, less robotic AI)
-            utterThis.pitch = 0.85; 
+            utterThis.pitch = 0.95; 
             utterThis.rate = 0.85;
             
             this.synth.speak(utterThis);
@@ -87,7 +85,7 @@ const BaseCards = {
         { t: 'CONFESSION', d: 'Admit a minor lie you\'ve told recently, or take 3 sips.' }
     ],
     minigame: [
-        { t: 'SUCK AND BLOW', d: 'Pass a playing card using only your mouths. Drops it? Both drink.' },
+        { t: 'SUCK AND BLOW', d: 'Pass a napkin or piece of paper using only your mouths. Drops it? Both drink.' },
         { t: 'NEVER HAVE I EVER', d: '3 fingers. Make them dirty. First out takes a shot.' },
         { t: 'EYE CONTACT', d: 'Stare deeply into the eyes of a player of the opposite gender. First to blink or laugh drinks.' },
         { t: 'TRUTH OR DARE', d: 'Pick a player of the opposite gender to answer a dirty truth or perform a dare. Refusal = 3 sips.' },
@@ -154,7 +152,7 @@ const AudioEngine = {
     isMuted: false,
     init() {
         this.theme.loop = true;
-        this.theme.volume = 0.35;
+        this.theme.volume = 0.15;
     },
     playTheme() {
         if (!this.isMuted && this.theme.paused) {
