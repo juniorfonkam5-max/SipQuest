@@ -193,6 +193,15 @@ function renderSetupScreen() {
         
         <button id="btn-toggle-music" style="position: absolute; top: 1rem; right: 1rem; z-index: 60; background: rgba(0,0,0,0.5); border: 2px solid var(--slime-cyan); color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(5px);">🎵</button>
         
+        <button id="btn-class-info" style="position: absolute; top: 1rem; left: 1rem; z-index: 60; background: rgba(0,0,0,0.5); border: 2px solid var(--royal-gold); color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(5px); box-shadow: 0 0 10px var(--royal-gold);">📖</button>
+
+        <!-- Guild Compendium Modal -->
+        <div id="class-modal" style="position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index: 100; display:none; flex-direction:column; padding:2rem; overflow-y:auto; backdrop-filter: blur(10px);">
+            <h2 class="text-gold" style="font-family: var(--font-pixel); margin-bottom: 2rem; margin-top: 1rem; text-align:center; font-size: 1.2rem;">Guild Compendium</h2>
+            <button id="btn-close-modal" style="position:absolute; top:1rem; right:1.5rem; background:transparent; border:none; color:white; font-size:2rem; cursor:pointer;">✕</button>
+            <div id="class-list-container" style="display:flex; flex-direction:column; gap:1rem; padding-bottom: 3rem;"></div>
+        </div>
+        
         <div class="glass-panel player-input-panel" style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
             <h2 class="text-cyan" style="font-family: var(--font-pixel); font-size: 0.8rem; margin-bottom: 1.5rem;">Register Party Members</h2>
             
@@ -218,6 +227,42 @@ function attachSetupListeners() {
             const muted = AudioEngine.toggleMute();
             btnMusic.style.opacity = muted ? '0.5' : '1';
             btnMusic.innerHTML = muted ? '🔇' : '🎵';
+        });
+    }
+    
+    const btnInfo = document.getElementById('btn-class-info');
+    const modal = document.getElementById('class-modal');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const classListContainer = document.getElementById('class-list-container');
+
+    if (btnInfo && modal) {
+        btnInfo.addEventListener('click', (e) => {
+            e.stopPropagation();
+            classListContainer.innerHTML = '';
+            const list = ['hero', 'archmage', 'goddess', 'edgelord', 'cleric', 'tank', 'assassin', 'bard', 'necromancer', 'magician', 'paladin', 'berserker', 'ranger', 'monk', 'summoner', 'alchemist', 'jester', 'healer'];
+            
+            const classEmojis = { hero: '🗡️', archmage: '🔮', goddess: '💧', edgelord: '🖤', cleric: '✨', tank: '🛡️', assassin: '🥷', bard: '🎵', necromancer: '💀', magician: '🎩', paladin: '🛡️', healer: '⚕️', berserker: '🔥', ranger: '🏹', monk: '🥋', summoner: '📜', alchemist: '⚗️', jester: '🤡' };
+            
+            list.forEach(c => {
+                const row = document.createElement('div');
+                row.style.cssText = "background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; border-left: 3px solid var(--royal-gold);";
+                row.innerHTML = `
+                    <h3 style="color:var(--slime-cyan); font-family: var(--font-pixel); font-size: 0.9rem; margin-bottom:6px;">${classEmojis[c] || '⚔️'} ${getClassName(c).toUpperCase()}</h3>
+                    <p style="color:rgba(255,255,255,0.85); font-size: 0.8rem; line-height: 1.4; font-style:italic;">${getClassAbility(c)}</p>
+                    <p style="color:var(--mana-blue); font-size: 0.75rem; margin-top: 6px; font-weight: bold;">Active Ability: ${getAbilityName(c)} (${getInitialCharges(c)} charges)</p>
+                `;
+                classListContainer.appendChild(row);
+            });
+            
+            modal.style.display = 'flex';
+            gsap.fromTo(modal, {opacity: 0, y: 30}, {opacity: 1, y: 0, duration: 0.3});
+        });
+        
+        btnCloseModal.addEventListener('click', (e) => {
+            e.stopPropagation();
+            gsap.to(modal, {opacity: 0, y: 30, duration: 0.2, onComplete: () => {
+                modal.style.display = 'none';
+            }});
         });
     }
 
