@@ -585,7 +585,7 @@ function getClassAbility(type) {
         jester: 'Forces a random player to drink whenever you drink.',
         hero: 'Has 1 native Reroll per game.',
         archmage: '2x Damage on hit, but suffers a Cooldown (extra sip).',
-        goddess: 'Chaos: Completely randomizes card draws.',
+        goddess: 'Completely randomizes card draws.',
         edgelord: 'Immune to the first penalty. Too cool to cheer.',
         cleric: 'Protects the party from 1 boss heal.',
         tank: 'Takes the next penalty for the party.'
