@@ -18,18 +18,23 @@ const VoiceEngine = {
         const voices = this.synth.getVoices();
         if (voices.length === 0) return;
         
-        // Hyper-aggressive en-AU query (Australian Female)
+        // Prioritize Microsoft "Natural" voices for higher quality and less robotic tones
         let targetVoice = voices.find(v => 
+            v.name.toLowerCase().includes('natural') && (v.lang.toLowerCase().includes('en-au') || v.lang.toLowerCase().includes('en-gb')) && v.name.toLowerCase().includes('female')
+        ) ||
+        voices.find(v => v.name.toLowerCase().includes('natural') && v.lang.toLowerCase().includes('en-au')) ||
+        voices.find(v => 
             (v.lang.toLowerCase().includes('en-au') || v.lang.toLowerCase().includes('en_au')) && 
             (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('natasha') || v.name.toLowerCase().includes('annette'))
         ) || 
         voices.find(v => v.lang.toLowerCase().includes('en-au') || v.lang.toLowerCase().includes('en_au')) ||
         voices.find(v => v.name.toLowerCase().includes('australia')) ||
-        voices.find(v => v.name.toLowerCase().includes('natasha') || v.name.toLowerCase().includes('karen'));
+        voices.find(v => v.name.toLowerCase().includes('natasha'));
         
-        // Final fallback: UK/US Female if absolutely no AU traces exist natively on their OS
+        // Final fallback: Any natural US voice, then standard female
         if (!targetVoice) {
-            targetVoice = voices.find(v => v.lang.toLowerCase().includes('en-') && v.name.toLowerCase().includes('female'));
+            targetVoice = voices.find(v => v.name.toLowerCase().includes('natural') && v.lang.toLowerCase().includes('en-us') && v.name.toLowerCase().includes('female')) ||
+                          voices.find(v => v.lang.toLowerCase().includes('en-') && v.name.toLowerCase().includes('female'));
         }
                         
         this.voice = targetVoice || voices[0];
@@ -47,9 +52,9 @@ const VoiceEngine = {
             if (this.voice) {
                 utterThis.voice = this.voice;
             }
-            // Nova's delivery (Human Realistic)
-            utterThis.pitch = 1.0; 
-            utterThis.rate = 0.9;
+            // Nova's delivery (Sultry, relaxed, less robotic AI)
+            utterThis.pitch = 0.85; 
+            utterThis.rate = 0.85;
             
             this.synth.speak(utterThis);
         }
@@ -144,10 +149,38 @@ const DOM = {
     }
 };
 
+const AudioEngine = {
+    theme: new Audio('./theme.mp3'),
+    isMuted: false,
+    init() {
+        this.theme.loop = true;
+        this.theme.volume = 0.35;
+    },
+    playTheme() {
+        if (!this.isMuted && this.theme.paused) {
+            this.theme.play().catch(e => console.log("Autoplay prevented:", e));
+        }
+    },
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.isMuted) {
+            this.theme.pause();
+        } else {
+            this.theme.play().catch(e => console.log("Autoplay prevented:", e));
+        }
+        return this.isMuted;
+    }
+};
+
 // Initialization
 function init() {
     console.log("SipQuest initialized.");
     VoiceEngine.init();
+    AudioEngine.init();
+    
+    // Unblock audio on first interaction
+    document.body.addEventListener('click', () => { AudioEngine.playTheme(); }, { once: true });
+    document.body.addEventListener('keydown', () => { AudioEngine.playTheme(); }, { once: true });
     
     // We will build setup UI here shortly
     renderSetupScreen();
@@ -159,6 +192,8 @@ function renderSetupScreen() {
             <h1 class="text-cyan" style="font-size: 2.5rem; line-height: 1.5; margin-bottom: 0.5rem; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px;">SipQuest</h1>
             <p class="text-gold" style="font-family: var(--font-pixel); font-size: 0.7rem;">Guild Registration Window</p>
         </div>
+        
+        <button id="btn-toggle-music" style="position: absolute; top: 1rem; right: 1rem; z-index: 60; background: rgba(0,0,0,0.5); border: 2px solid var(--slime-cyan); color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(5px);">🎵</button>
         
         <div class="glass-panel player-input-panel" style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
             <h2 class="text-cyan" style="font-family: var(--font-pixel); font-size: 0.8rem; margin-bottom: 1.5rem;">Register Party Members</h2>
@@ -178,6 +213,16 @@ function renderSetupScreen() {
 }
 
 function attachSetupListeners() {
+    const btnMusic = document.getElementById('btn-toggle-music');
+    if (btnMusic) {
+        btnMusic.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent body click handler from overlapping
+            const muted = AudioEngine.toggleMute();
+            btnMusic.style.opacity = muted ? '0.5' : '1';
+            btnMusic.innerHTML = muted ? '🔇' : '🎵';
+        });
+    }
+
     const btnAdd = document.getElementById('btn-add-player');
     const inputName = document.getElementById('new-player-name');
     const classSelect = document.getElementById('new-player-class');
