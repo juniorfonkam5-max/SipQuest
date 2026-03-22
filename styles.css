@@ -1,0 +1,434 @@
+/* =========================================================================
+   "That Time I Got Drunk as a Slime" - Isekai JRPG Styles
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Press+Start+2P&display=swap');
+
+:root {
+    /* Isekai Palette */
+    --bg-dark: #050510;
+    --bg-panel: rgba(10, 15, 30, 0.75);
+    --bg-panel-border: rgba(0, 255, 255, 0.3);
+    
+    --slime-cyan: #00FFFF;
+    --slime-cyan-glow: rgba(0, 255, 255, 0.6);
+    
+    --mana-blue: #4169E1;
+    --mana-blue-glow: rgba(65, 105, 225, 0.6);
+    
+    --health-red: #FF3333;
+    --health-red-glow: rgba(255, 51, 51, 0.6);
+    
+    --royal-gold: #FFD700;
+    --royal-gold-glow: rgba(255, 215, 0, 0.6);
+    
+    --boss-purple: #8A2BE2;
+    --boss-purple-glow: rgba(138, 43, 226, 0.8);
+    
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0C4DE;
+    
+    /* Typography */
+    --font-pixel: 'Press Start 2P', cursive;
+    --font-body: 'Outfit', sans-serif;
+    
+    /* Layout */
+    --padding-mobile: 1.5rem;
+    --border-radius-lg: 12px;
+    --border-radius-md: 8px;
+    --border-radius-sm: 4px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    /* Ambient magical background */
+    background-image: radial-gradient(circle at 50% 0%, #171c35 0%, var(--bg-dark) 80%);
+}
+
+/* Typography styles */
+h1, h2, h3, h4 {
+    font-family: var(--font-pixel);
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+/* Screens */
+#app-container { width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; }
+.screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; flex-direction: column; padding: var(--padding-mobile); overflow-y: auto; overflow-x: hidden; }
+.screen.active { display: flex; }
+.screen.hidden { display: none !important; }
+
+/* JRPG Glass Panels */
+.glass-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid var(--bg-panel-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 0 15px rgba(0,255,255,0.1), inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+.text-cyan { color: var(--slime-cyan); text-shadow: 0 0 10px var(--slime-cyan-glow); }
+.text-gold { color: var(--royal-gold); text-shadow: 0 0 10px var(--royal-gold-glow); }
+.text-red { color: var(--health-red); text-shadow: 0 0 10px var(--health-red-glow); }
+
+/* Buttons */
+.btn {
+    appearance: none; border: none; background: transparent;
+    font-family: var(--font-pixel); font-size: 0.8rem;
+    color: var(--text-primary);
+    padding: 1rem 1.5rem; border-radius: var(--border-radius-sm);
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: all 0.2s; line-height: 1.5; text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(180deg, #1A2980, var(--mana-blue));
+    border: 2px solid var(--slime-cyan);
+    box-shadow: 0 4px 0 #0f1c50, 0 0 10px var(--slime-cyan-glow);
+}
+
+.btn-primary:active {
+    transform: translateY(4px); box-shadow: 0 0 0 #0f1c50, 0 0 5px var(--slime-cyan-glow);
+}
+
+.btn-danger {
+    background: linear-gradient(180deg, #8B0000, var(--health-red));
+    border: 2px solid #FF9999;
+    box-shadow: 0 4px 0 #4a0000, 0 0 10px var(--health-red-glow);
+}
+
+.btn-danger:active {
+    transform: translateY(4px); box-shadow: 0 0 0 #4a0000, 0 0 5px var(--health-red-glow);
+}
+
+/* =========================================================================
+   Demon King Tracker
+   ========================================================================= */
+.boss-container {
+    padding: 1.5rem;
+    background: rgba(5, 0, 10, 0.9);
+    border-bottom: 3px solid var(--boss-purple);
+    box-shadow: 0 10px 30px var(--boss-purple-glow);
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; z-index: 50; overflow: hidden;
+}
+
+.demon-king-aura {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+    box-shadow: inset 0 0 60px var(--boss-purple-glow);
+    animation: pulse-aura 3s infinite alternate;
+}
+
+.boss-title {
+    font-size: 1.2rem; color: var(--boss-purple);
+    text-shadow: 2px 2px 0px #000, 0 0 15px var(--boss-purple-glow);
+    margin-bottom: 0.8rem; letter-spacing: 2px; position: relative; z-index: 5;
+}
+
+.health-bar-bg {
+    width: 100%; max-width: 500px; height: 24px;
+    background: #220022; border: 3px solid #000;
+    box-shadow: 0 0 0 2px var(--boss-purple);
+    position: relative;
+    z-index: 5; /* Keep above aura */
+}
+
+.health-bar-fill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #4B0082, var(--boss-purple));
+    transition: width 0.3s ease-out;
+}
+
+.health-text {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-family: var(--font-pixel); font-size: 0.6rem; color: white;
+    text-shadow: 1px 1px 0 #000; z-index: 6; width: 100%; text-align: center;
+}
+
+/* =========================================================================
+   Game Layout & Board Path
+   ========================================================================= */
+.game-layout { display: flex; flex-direction: column; flex-grow: 1; position: relative; padding-bottom: 120px; overflow: hidden; }
+.board-container { flex-grow: 1; overflow-y: auto; padding: 1rem; position: relative; }
+
+.board-grid { 
+    display: grid; 
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 8px; 
+    width: 100%; 
+    max-width: 600px; 
+    margin: 1rem auto; 
+}
+
+/* On very small mobile, drop to 4 cols to prevent squishing */
+@media (max-width: 400px) {
+    .board-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.tile {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: bold; position: relative;
+    aspect-ratio: 1/1; /* Square RPG map grid tiles */
+    border-radius: var(--border-radius-md); 
+    border: 2px solid var(--royal-gold);
+    background: rgba(10, 15, 30, 0.9);
+    box-shadow: 0 0 10px var(--royal-gold-glow); color: white; z-index: 10;
+}
+.tile::after {
+    content: attr(data-index); position: absolute; top: 2px; left: 2px; font-size: 0.5rem; font-family: var(--font-pixel); color: var(--text-secondary);
+}
+
+.tile.type-start { border-color: var(--slime-cyan); box-shadow: 0 0 15px var(--slime-cyan-glow); }
+.tile.type-boss { border-color: var(--boss-purple); box-shadow: 0 0 20px var(--boss-purple-glow); background: #110022; }
+
+/* Players on Tile */
+.players-on-tile {
+    position: absolute; bottom: 2px; right: 2px;
+    display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: flex-end;
+    gap: 2px; width: 100%; height: 100%; pointer-events: none;
+}
+.player-token {
+    width: 32px; height: 32px; font-size: 1.2rem; position: relative; /* Enlarged avatars */
+    border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 8px rgba(0,0,0,0.8); z-index: 15; background: #333;
+}
+
+/* Bottom Controls */
+.game-controls {
+    position: absolute; bottom: 0; left: 0; width: 100%; padding: 1rem;
+    background: linear-gradient(to top, rgba(5,5,16,1) 80%, rgba(5,5,16,0));
+    display: flex; justify-content: space-between; align-items: center; z-index: 20;
+}
+
+.current-player-display {
+    display: flex; align-items: center; gap: 10px; flex-grow: 1; margin-right: 15px;
+    background: rgba(10,15,30,0.9); padding: 0.8rem;
+    border: 2px solid var(--slime-cyan); border-radius: var(--border-radius-md);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 10px var(--slime-cyan-glow);
+}
+
+.player-class-badge { font-family: var(--font-pixel); font-size: 0.5rem; color: var(--royal-gold); margin-top: 5px; }
+.player-status-badge { font-family: var(--font-pixel); font-size: 0.5rem; color: var(--health-red); margin-top: 2px; }
+
+.dice-container { perspective: 1000px; }
+.dice {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--mana-blue); border: 2px solid var(--slime-cyan);
+    color: white; font-size: 2rem; display: flex; align-items: center; justify-content: center; text-align: center;
+    cursor: pointer; box-shadow: 0 0 15px var(--mana-blue-glow); text-shadow: 0 2px 5px rgba(0,0,0,0.5); padding: 5px;
+    transition: transform 0.2s;
+}
+.dice:active { transform: scale(0.9); }
+
+.rolling {
+    animation: roll-anim 0.5s infinite linear;
+}
+@keyframes roll-anim {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* =========================================================================
+   Holographic Quest Boards
+   ========================================================================= */
+.card-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 5, 10, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.card-overlay.visible { opacity: 1; pointer-events: auto; }
+
+.card-container { perspective: 1000px; width: 300px; height: 420px; }
+
+.card {
+    width: 100%; height: 100%; position: relative;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+}
+.card.is-flipped { transform: rotateY(180deg); }
+
+.card-face {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: var(--border-radius-md); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 2rem; text-align: center;
+    background: rgba(10, 20, 40, 0.95); border: 2px solid var(--slime-cyan);
+    box-shadow: 0 0 20px var(--slime-cyan-glow), inset 0 0 30px rgba(0,255,255,0.1);
+}
+
+.card-front { transform: rotateY(0deg); }
+.card-front::after { content: '?'; font-family: var(--font-pixel); font-size: 6rem; color: var(--slime-cyan); text-shadow: 0 0 20px var(--slime-cyan-glow); }
+.card-back { transform: rotateY(180deg); }
+
+.card-title { font-family: var(--font-pixel); font-size: 1rem; margin-bottom: 1.5rem; color: var(--royal-gold); text-shadow: 0 0 10px var(--royal-gold-glow); line-height: 1.4; }
+.card-desc { font-size: 1.1rem; color: var(--text-primary); line-height: 1.5; }
+
+/* =========================================================================
+   Anime Combat Animations
+   ========================================================================= */
+
+/* Sword Slash */
+.sword-slash {
+    position: absolute; top: 50%; left: 50%; width: 150%; height: 6px;
+    background: white; box-shadow: 0 0 15px white, 0 0 30px var(--slime-cyan);
+    transform: translate(-50%, -50%) rotate(-30deg) scaleX(0);
+    transform-origin: center; pointer-events: none; z-index: 200; opacity: 0;
+}
+.sword-slash-animate { animation: slash-anim 0.4s ease-out forwards; }
+
+@keyframes slash-anim {
+    0% { transform: translate(-50%, -50%) rotate(-30deg) scaleX(0); opacity: 1; }
+    50% { transform: translate(-50%, -50%) rotate(-30deg) scaleX(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) rotate(-30deg) scaleX(1.2); opacity: 0; }
+}
+
+/* Floating Damage */
+.floating-damage {
+    position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+    font-family: var(--font-pixel); font-size: 2.5rem; color: var(--royal-gold);
+    text-shadow: 3px 3px 0 #000, 0 0 15px var(--royal-gold-glow);
+    z-index: 210; opacity: 0; pointer-events: none;
+}
+.damage-animate { animation: float-up 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+@keyframes float-up {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20% { transform: translate(-50%, -100%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
+}
+
+/* Screen Shake & Explosion */
+.screen-shake { animation: shake-anim 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shake-anim {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+    40%, 60% { transform: translate3d(8px, 0, 0); }
+}
+
+.explosion-flash {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--health-red); z-index: 600; mix-blend-mode: screen;
+    pointer-events: none; animation: flash-fade 0.5s ease-out forwards;
+}
+@keyframes flash-fade {
+    0% { opacity: 0.8; }
+    100% { opacity: 0; display: none; }
+}
+@keyframes pulse-aura {
+    0% { box-shadow: inset 0 0 30px var(--boss-purple-glow); }
+    100% { box-shadow: inset 0 0 100px var(--boss-purple-glow); }
+}
+
+/* Climax Boss Overlay */
+.climax-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(5,0,10,0.98); z-index: 500; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 2rem; text-align: center;
+}
+.climax-overlay.visible { opacity: 1; pointer-events: auto; }
+.climax-title { font-family: var(--font-pixel); font-size: 2.5rem; color: var(--boss-purple); text-shadow: 0 0 20px var(--boss-purple-glow); margin-bottom: 2rem; line-height: 1.4; }
+.climax-message { font-family: var(--font-body); font-size: 1.2rem; color: white; margin-bottom: 3rem; }
+
+/* =========================================================================
+   Boss UI (The Demon King)
+   ========================================================================= */
+.boss-container {
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.boss-title {
+    font-family: var(--font-pixel);
+    color: var(--health-red);
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px var(--health-red-glow);
+    margin-bottom: 0.5rem;
+}
+
+.demon-king-aura {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(138,43,226,0.2) 0%, transparent 70%);
+    animation: pulse-aura-boss 3s infinite alternate ease-in-out;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes pulse-aura-boss {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+}
+
+.health-bar-bg {
+    width: 95%; max-width: 600px; margin: 0 auto; position: relative;
+    border: 4px solid var(--royal-gold); border-radius: 20px;
+    background: #0a0a0a; box-shadow: 0 0 25px rgba(114, 9, 183, 0.6);
+    height: 40px; overflow: hidden; /* Enlarged Height */
+}
+.health-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #D90429, #F94144);
+    width: 100%; transition: width 0.5s ease;
+}
+.health-text {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-family: var(--font-pixel); color: white; font-size: 1.3rem; /* Enlarged Text */
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* Combat FX */
+.sword-slash {
+    position: absolute; top: 50%; left: -20%; width: 150%; height: 4px;
+    background: white; box-shadow: 0 0 10px white, 0 0 20px var(--slime-cyan);
+    transform: translateY(-50%) rotate(15deg) scaleX(0); opacity: 0; pointer-events: none;
+}
+.sword-slash-animate {
+    animation: slash 0.3s ease-out forwards;
+}
+@keyframes slash {
+    0% { transform: translateY(-50%) rotate(15deg) scaleX(0); opacity: 1; }
+    50% { transform: translateY(-50%) rotate(15deg) scaleX(1); opacity: 1; }
+    100% { transform: translateY(-50%) rotate(15deg) scaleX(1); opacity: 0; }
+}
+
+.floating-damage {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: white; font-family: var(--font-pixel); font-size: 2.5rem; /* Massive damage text */
+    text-shadow: 3px 3px 0 var(--health-red), -2px -2px 0 var(--boss-purple);
+    opacity: 0; pointer-events: none; z-index: 50;
+}
+.damage-animate {
+    animation: floatUp 1s ease-out forwards;
+}
+@keyframes floatUp {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20% { transform: translate(-50%, -80%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
+}
+
+/* =========================================================================
+   Class Ability Tooltips (Popups) - Deprecated for native display
+   ========================================================================= */
+.player-class-badge {
+    display: inline-block;
+}
