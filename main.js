@@ -1042,9 +1042,9 @@ function drawCard(type) {
     let queryType = type;
     
     if (player.classType === 'goddess') {
-        const types = ['truth', 'dare', 'minigame', 'rule'];
+        const types = ['drink', 'minigame', 'rule', 'david'];
         queryType = types[Math.floor(Math.random() * types.length)];
-        VoiceEngine.speak("Goddess Chaos activation. Quest type modified.", true);
+        VoiceEngine.speak("Goddess Miracle. Quest type modified.", true);
     }
 
     let deckSource = BaseCards;
