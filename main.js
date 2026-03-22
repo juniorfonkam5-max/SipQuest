@@ -52,7 +52,7 @@ const VoiceEngine = {
             }
             // Nova's delivery (Sultry, relaxed, less robotic AI)
             utterThis.pitch = 0.95; 
-            utterThis.rate = 0.85;
+            utterThis.rate = 0.92;
             
             this.synth.speak(utterThis);
         }
@@ -152,7 +152,7 @@ const AudioEngine = {
     isMuted: false,
     init() {
         this.theme.loop = true;
-        this.theme.volume = 0.15;
+        this.theme.volume = 0.08;
     },
     playTheme() {
         if (!this.isMuted && this.theme.paused) {
